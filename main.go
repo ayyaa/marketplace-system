@@ -5,6 +5,7 @@ import (
 	"marketplace-system/config"
 	"marketplace-system/database"
 	"marketplace-system/handlers"
+	"marketplace-system/lib/validator"
 	repository "marketplace-system/repositories"
 	"marketplace-system/routes"
 	"marketplace-system/services"
@@ -46,7 +47,7 @@ func New() *Main {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:3000
+// @host localhost:5657
 // @BasePath /v1
 // @schemes http
 func (m *Main) Init() (err error) {
@@ -107,8 +108,6 @@ func (m *Main) Init() (err error) {
 	})
 
 	m.router = e
-
-	// fmt.Println(m)
 	routes.ConfigureRouter(e, m.handler)
 	return nil
 }
@@ -130,6 +129,7 @@ func (m *Main) close() {
 
 func main() {
 	app := New()
+	validator.InitValidator()
 	err := app.Init()
 	if err != nil {
 		log.Fatalf("Error in initializing the application: %+v", err)

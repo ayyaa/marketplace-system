@@ -7,6 +7,7 @@ import (
 )
 
 type Main struct {
+	Customer CustomerInterface
 }
 
 type repository struct {
@@ -19,9 +20,11 @@ type Options struct {
 }
 
 func Init(opts Options) *Main {
-	// repo := &repository{opts}
+	repo := &repository{opts}
 
-	m := &Main{}
+	m := &Main{
+		Customer: (*customerRepository)(repo),
+	}
 
 	return m
 }

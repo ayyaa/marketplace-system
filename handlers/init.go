@@ -5,7 +5,9 @@ import (
 	"marketplace-system/services"
 )
 
-type Main struct{}
+type Main struct {
+	Customer CustomerInterface
+}
 
 type handlers struct {
 	Options Options
@@ -17,9 +19,11 @@ type Options struct {
 }
 
 func Init(opts Options) *Main {
-	// hdrl := &handlers{opts}
+	hdrl := &handlers{opts}
 
-	m := &Main{}
+	m := &Main{
+		Customer: (*customerHandlers)(hdrl),
+	}
 
 	return m
 }

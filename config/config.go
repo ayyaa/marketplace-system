@@ -14,6 +14,7 @@ type Config struct {
 	ServiceEnvironment string   `mapstructure:"service_environment" json:"service_environment"`
 	ServicePort        string   `mapstructure:"service_port" json:"service_port"`
 	Database           Database `mapstructure:"database" json:"database"`
+	SecretKeyJWT       string   `mapstructure:"secret_key_jwt" json:"secret_key_jwt"`
 }
 
 func NewConfig() *Config {
@@ -23,6 +24,7 @@ func NewConfig() *Config {
 		ServiceEnvironment: viper.GetString(`server.environtment`),
 		ServicePort:        viper.GetString(`server.port`),
 		Database:           LoadConfigDB(),
+		SecretKeyJWT:       viper.GetString(`jwt.secret_key`),
 	}
 }
 
