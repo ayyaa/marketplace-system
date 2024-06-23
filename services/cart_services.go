@@ -15,6 +15,7 @@ type CartInterface interface {
 	AddToCart(ctx context.Context, addCart models.ActionCart) (err error)
 	DecreaseFromCart(ctx context.Context, addCart models.ActionCart) (err error)
 	DeleteFromCart(ctx context.Context, addCart models.ActionCart) (err error)
+	GetCartList(ctx context.Context, id int) (models.Cart, error)
 }
 
 func (c *cartServices) AddToCart(ctx context.Context, addCart models.ActionCart) (err error) {
@@ -168,4 +169,13 @@ func (c *cartServices) DeleteFromCart(ctx context.Context, deleteRequest models.
 	}
 
 	return customerror.NewInternalError("product not found in cart")
+}
+
+func (c *cartServices) GetCartList(ctx context.Context, id int) (cart models.Cart, err error) {
+	cart, err = c.Options.Repository.Cart.GetCartList(ctx, id)
+	if err != nil {
+		return cart, err
+	}
+
+	return cart, nil
 }

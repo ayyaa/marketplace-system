@@ -18,6 +18,7 @@ type CartInterface interface {
 	AddToCart(ctx echo.Context) error
 	DecreaseFromCart(ctx echo.Context) error
 	DeleteFromCart(ctx echo.Context) error
+	CartDetailList(ctx echo.Context) error
 }
 
 // Customer godoc
@@ -149,4 +150,28 @@ func (c *cartHandlers) DeleteFromCart(ctx echo.Context) error {
 
 	logrus.Info(lang.SuccessMsg)
 	return utils.ResponseSuccess(ctx, nil)
+}
+
+// Cart godoc
+//
+//	@Summary		Get List of Cart
+//	@Description	Get list cart detail from cart
+//	@ID				cart-detail-list
+//	@Tags			Cart
+//	@Accept			json
+//	@Produce		json
+//	@Success		201		{object}	models.Response{data=[]models.Customer}
+//	@Failure		400		{object}	models.BasicResponse{message=[]string}
+//	@Failure		500		{object}	models.BasicResponse{messsage=[]string}
+//	@Router			/cart [get]
+func (c *cartHandlers) CartDetailList(ctx echo.Context) error {
+	id := ctx.Get("id").(int)
+
+	cart, err := c.Options.Services.Cart.GetCartList(ctx.Request().Context(), id)
+	if err != nil {
+		return utils.RespondWithError(ctx, http.StatusInternalServerError, utils.GetErrorResponse(err.Error(), http.StatusInternalServerError))
+	}
+
+	logrus.Info(lang.SuccessMsg)
+	return utils.ResponseSuccess(ctx, cart)
 }

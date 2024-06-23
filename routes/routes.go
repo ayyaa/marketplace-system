@@ -36,6 +36,7 @@ func ConfigureRouter(e *echo.Echo, handlers *handlers.Main, cfg *config.Config) 
 			cart.PATCH("/add", handlers.Cart.AddToCart)
 			cart.PATCH("/decrease", handlers.Cart.DecreaseFromCart)
 			cart.PATCH("/delete", handlers.Cart.DeleteFromCart)
+			cart.GET("", handlers.Cart.CartDetailList)
 		}
 
 	}

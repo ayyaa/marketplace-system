@@ -17,6 +17,7 @@ type CartInterface interface {
 	AddProductToCart(ctx context.Context, cartDetail models.CartDetail) error
 	GetOrCreateCart(ctx context.Context, tx *gorm.DB, ddToCart models.ActionCart) (*models.Cart, error)
 	GetCart(ctx context.Context, addToCart models.ActionCart) (cart *models.Cart, err error)
+	GetCartList(ctx context.Context, id int) (cart models.Cart, err error)
 }
 
 func (c *cartRepository) AddProductToCart(ctx context.Context, cartDetail models.CartDetail) error {
@@ -46,6 +47,18 @@ func (c *cartRepository) GetCart(ctx context.Context, addToCart models.ActionCar
 	if err != nil {
 		logrus.Error(fmt.Sprintf("Err - get cart - %s", err.Error()))
 		return nil, err
+	}
+
+	return cart, nil
+}
+
+func (c *cartRepository) GetCartList(ctx context.Context, id int) (cart models.Cart, err error) {
+	err = c.Options.Postgres.Preload("Details", func(db *gorm.DB) *gorm.DB {
+		return db.Where("cart_detail_status = ? ", "active")
+	}).Where("customer_id = ?", id).Where("cart_status = ?", "active").First(&cart).Error
+	if err != nil {
+		logrus.Error(fmt.Sprintf("Err - get cart list - %s", err.Error()))
+		return cart, err
 	}
 
 	return cart, nil
