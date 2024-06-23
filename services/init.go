@@ -11,6 +11,7 @@ type Main struct {
 	Customer CustomerInterface
 	Product  ProductInterface
 	Cart     CartInterface
+	Checkout CheckoutInterface
 }
 
 type services struct {
@@ -30,6 +31,7 @@ func Init(opts Options) *Main {
 		Customer: (*customerServices)(srvs),
 		Product:  (*productServices)(srvs),
 		Cart:     (*cartServices)(srvs),
+		Checkout: (*checkoutServices)(srvs),
 	}
 
 	return m

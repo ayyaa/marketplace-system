@@ -12,6 +12,7 @@ type Main struct {
 	Product    ProductInterface
 	Cart       CartInterface
 	CartDetail CartDetailInterface
+	Order      OrderInterface
 }
 
 type repository struct {
@@ -32,6 +33,7 @@ func Init(opts Options) *Main {
 		Product:    (*productRepository)(repo),
 		Cart:       (*cartRepository)(repo),
 		CartDetail: (*cartDetailRepository)(repo),
+		Order:      (*orderRepository)(repo),
 	}
 
 	return m

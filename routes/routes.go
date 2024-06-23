@@ -39,5 +39,10 @@ func ConfigureRouter(e *echo.Echo, handlers *handlers.Main, cfg *config.Config) 
 			cart.GET("", handlers.Cart.CartDetailList)
 		}
 
+		checkout := v1.Group("/checkout", middleware.JWTMiddleware(cfg.SecretKeyJWT))
+		{
+			checkout.POST("", handlers.Checkout.Checkout)
+		}
+
 	}
 }

@@ -18,6 +18,7 @@ type ProductInterface interface {
 	GetProductBySlug(ctx context.Context, productSlug string) (models.Product, error)
 	GetProductRedis(ctx context.Context, productID int) (models.Product, error)
 	SetProductRedis(ctx context.Context, cacheKey string, products []models.Product) error
+	GetProductById(ctx context.Context, id int) (models.Product, error)
 }
 
 func (c *productRepository) FindProductsByCategory(ctx context.Context, categorySlug string) (models.Category, error) {
@@ -51,10 +52,19 @@ func (c *productRepository) GetProductsByCategoryRedis(ctx context.Context, cate
 }
 
 func (c *productRepository) GetProductBySlug(ctx context.Context, productSlug string) (models.Product, error) {
-	// Query products by category ID
 	var product models.Product
 	if err := c.Options.Postgres.WithContext(ctx).Where("product_slug = ?", productSlug).First(&product).Error; err != nil {
 		logrus.Error(fmt.Sprintf("Err - get product by slug - %s", err.Error()))
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (c *productRepository) GetProductById(ctx context.Context, id int) (models.Product, error) {
+	var product models.Product
+	if err := c.Options.Postgres.WithContext(ctx).Where("product_id = ?", id).First(&product).Error; err != nil {
+		logrus.Error(fmt.Sprintf("Err - get product by id - %s", err.Error()))
 		return product, err
 	}
 
@@ -85,14 +95,14 @@ func (c *productRepository) SetProductRedis(ctx context.Context, cacheKey string
 	// Serialize products to JSON
 	productsJSON, err := json.Marshal(products)
 	if err != nil {
-		logrus.Error(fmt.Sprintf("Err - get product by slug from redis - %s", "Failed to serialize products"))
+		logrus.Error(fmt.Sprintf("Err - set product by slug from redis - %s", "Failed to serialize products"))
 		return err
 	}
 
 	// Store the result in Redis
 	err = c.Options.Redis.Set(ctx, cacheKey, productsJSON, 72*time.Hour).Err()
 	if err != nil {
-		logrus.Error(fmt.Sprintf("Err - get product by slug from redis - %s", "Failed to store in Redis"))
+		logrus.Error(fmt.Sprintf("Err - set product by slug from redis - %s", "Failed to store in Redis"))
 		return err
 	}
 

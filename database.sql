@@ -78,6 +78,7 @@ CREATE TABLE order_details (
     product_id INTEGER NOT NULL REFERENCES products(product_id),
     quantity INTEGER NOT NULL,
     price NUMERIC(10, 2) NOT NULL,
+    final_price NUMERIC(10, 2) NOT NULL,
     order_detail_status VARCHAR(10) CHECK (order_detail_status IN ('active', 'deleted')) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

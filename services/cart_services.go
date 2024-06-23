@@ -93,7 +93,7 @@ func (c *cartServices) DecreaseFromCart(ctx context.Context, decreaseRequest mod
 
 	decreaseRequest.ProductID = product.ProductID
 	// Create or update cart
-	cart, err := c.Options.Repository.Cart.GetCart(ctx, decreaseRequest)
+	cart, err := c.Options.Repository.Cart.GetCart(ctx, decreaseRequest.CustomerID)
 	if err != nil {
 		return err
 	}
@@ -142,7 +142,7 @@ func (c *cartServices) DeleteFromCart(ctx context.Context, deleteRequest models.
 	}
 
 	deleteRequest.ProductID = product.ProductID
-	cart, err := c.Options.Repository.Cart.GetCart(ctx, deleteRequest)
+	cart, err := c.Options.Repository.Cart.GetCart(ctx, deleteRequest.CustomerID)
 	if err != nil {
 		return err
 	}
