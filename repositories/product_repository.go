@@ -50,48 +50,6 @@ func (c *productRepository) GetProductsByCategoryRedis(ctx context.Context, cate
 	return products, nil
 }
 
-// func (c *productRepository) GetProductsByCategoryRedis(ctx context.Context, categorySlug string) (products []models.Product, err error) {
-// 	// Check Redis cache
-// 	cacheKey := fmt.Sprintf("products:category:%s", categorySlug)
-// 	val, err := c.Options.Redis.Get(ctx, cacheKey).Result()
-// 	if err == redis.Nil {
-// 		// Cache miss, query the database
-// 		category, err := c.FindProductsByCategory(ctx, categorySlug)
-// 		if err != nil {
-// 			logrus.Error(fmt.Sprintf("Err - get product by category from redis - %s", err.Error()))
-// 			return products, err
-// 		}
-
-// 		// Serialize products to JSON
-// 		productsJSON, err := json.Marshal(category.Products)
-// 		if err != nil {
-// 			logrus.Error(fmt.Sprintf("Err - get products by category from redis - %s", "Failed to serialize products"))
-// 			return products, err
-// 		}
-
-// 		// Store the result in Redis
-// 		err = c.Options.Redis.Set(ctx, cacheKey, productsJSON, 72*time.Hour).Err()
-// 		if err != nil {
-// 			logrus.Error(fmt.Sprintf("Err - get products by category from redis - %s", "Failed to store in Redis"))
-// 			return products, err
-// 		}
-
-// 		return category.Products, nil
-// 	} else if err != nil {
-// 		logrus.Error(fmt.Sprintf("Err - get product by category from redis - %s", err.Error()))
-// 		return products, err
-// 	}
-
-// 	// Cache hit, return the cached value
-// 	err = json.Unmarshal([]byte(val), &products)
-// 	if err != nil {
-// 		logrus.Error(fmt.Sprintf("Err - get product by category from redis - %s", "Failed to deserialize products"))
-// 		return products, err
-// 	}
-
-// 	return products, nil
-// }
-
 func (c *productRepository) GetProductBySlug(ctx context.Context, productSlug string) (models.Product, error) {
 	// Query products by category ID
 	var product models.Product

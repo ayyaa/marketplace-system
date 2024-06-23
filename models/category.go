@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Category struct {
-	CategoryID     uint      `gorm:"primaryKey;autoIncrement"`
+	CategoryID     int       `gorm:"primaryKey;autoIncrement"`
 	CategoryUUID   string    `gorm:"type:uuid;not null"`
 	CategoryName   string    `gorm:"type:varchar(255);not null"`
 	CategorySlug   string    `gorm:"type:varchar(255);not null"`

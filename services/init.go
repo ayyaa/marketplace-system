@@ -3,11 +3,14 @@ package services
 import (
 	"marketplace-system/config"
 	repository "marketplace-system/repositories"
+
+	"gorm.io/gorm"
 )
 
 type Main struct {
 	Customer CustomerInterface
 	Product  ProductInterface
+	Cart     CartInterface
 }
 
 type services struct {
@@ -17,6 +20,7 @@ type services struct {
 type Options struct {
 	Repository *repository.Main
 	Config     *config.Config
+	Postgres   *gorm.DB
 }
 
 func Init(opts Options) *Main {
@@ -25,6 +29,7 @@ func Init(opts Options) *Main {
 	m := &Main{
 		Customer: (*customerServices)(srvs),
 		Product:  (*productServices)(srvs),
+		Cart:     (*cartServices)(srvs),
 	}
 
 	return m

@@ -5,9 +5,9 @@ import (
 )
 
 type Product struct {
-	ProductID     uint      `gorm:"primaryKey;autoIncrement"`
+	ProductID     int       `gorm:"primaryKey;autoIncrement"`
 	ProductUUID   string    `gorm:"type:uuid;not null"`
-	CategoryID    uint      `gorm:"not null"`
+	CategoryID    int       `gorm:"not null"`
 	ProductName   string    `gorm:"type:varchar(255);not null"`
 	ProductSlug   string    `gorm:"type:varchar(255);not null"`
 	Price         float64   `gorm:"type:numeric(10,2);not null"`

@@ -12,7 +12,7 @@ type CustomerRequest struct {
 
 // Customer struct definition
 type Customer struct {
-	CustomerID     uint      `gorm:"primaryKey;autoIncrement"`
+	CustomerID     int       `gorm:"primaryKey;autoIncrement"`
 	CustomerUUID   string    `gorm:"type:uuid;not null"`
 	FullName       string    `gorm:"type:varchar(255);not null"`
 	Email          string    `gorm:"type:varchar(255);unique;not null"`

@@ -1,14 +1,16 @@
 package routes
 
 import (
+	"marketplace-system/config"
 	"marketplace-system/handlers"
+	"marketplace-system/middleware"
 
 	"github.com/labstack/echo/v4"
 
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
-func ConfigureRouter(e *echo.Echo, handlers *handlers.Main) {
+func ConfigureRouter(e *echo.Echo, handlers *handlers.Main, cfg *config.Config) {
 
 	v1 := e.Group("/v1")
 	{
@@ -27,6 +29,13 @@ func ConfigureRouter(e *echo.Echo, handlers *handlers.Main) {
 		categories := v1.Group("/categories")
 		{
 			categories.GET("/:slug/products", handlers.Product.FindProductsByCategory)
+		}
+
+		cart := v1.Group("/cart", middleware.JWTMiddleware(cfg.SecretKeyJWT))
+		{
+			cart.PATCH("/add", handlers.Cart.AddToCart)
+			cart.PATCH("/decrease", handlers.Cart.DecreaseFromCart)
+			cart.PATCH("/delete", handlers.Cart.DeleteFromCart)
 		}
 
 	}

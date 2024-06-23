@@ -108,6 +108,7 @@ func (m *Main) Init() (err error) {
 	m.service = services.Init(services.Options{
 		Config:     m.cfg,
 		Repository: m.repo,
+		Postgres:   m.database.Postgres,
 	})
 	m.handler = handlers.Init(handlers.Options{
 		Config:   m.cfg,
@@ -115,7 +116,7 @@ func (m *Main) Init() (err error) {
 	})
 
 	m.router = e
-	routes.ConfigureRouter(e, m.handler)
+	routes.ConfigureRouter(e, m.handler, m.cfg)
 	return nil
 }
 

@@ -8,9 +8,10 @@ import (
 )
 
 type Main struct {
-	Customer CustomerInterface
-	Product  ProductInterface
-	Cart     CartInterface
+	Customer   CustomerInterface
+	Product    ProductInterface
+	Cart       CartInterface
+	CartDetail CartDetailInterface
 }
 
 type repository struct {
@@ -27,9 +28,10 @@ func Init(opts Options) *Main {
 	repo := &repository{opts}
 
 	m := &Main{
-		Customer: (*customerRepository)(repo),
-		Product:  (*productRepository)(repo),
-		Cart:     (*cartRepository)(repo),
+		Customer:   (*customerRepository)(repo),
+		Product:    (*productRepository)(repo),
+		Cart:       (*cartRepository)(repo),
+		CartDetail: (*cartDetailRepository)(repo),
 	}
 
 	return m

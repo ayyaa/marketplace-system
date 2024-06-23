@@ -1,14 +1,16 @@
 package middleware
 
 import (
+	"errors"
 	"marketplace-system/config"
-	customerror "marketplace-system/lib/customerrors"
+	utils "marketplace-system/lib/helper"
 	"marketplace-system/models"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/labstack/echo/v4"
 )
 
 type Claims struct {
@@ -20,9 +22,15 @@ type Claims struct {
 }
 
 var (
-	ErrNoAuthHeader      = customerror.NewInternalErrorf("Authorization header is missing")
-	ErrInvalidAuthHeader = customerror.NewInternalErrorf("Authorization header is malformed")
-	ErrClaimsInvalid     = customerror.NewInternalErrorf("Provided claims do not match expected scopes")
+	prefixBearer = "Bearer"
+	headerAuth   = "Authorization"
+)
+
+var (
+	ErrNoAuthHeader      = errors.New("Authorization header required")
+	ErrInvalidAuthHeader = errors.New("Invalid authorization header")
+	ErrInvalidToken      = errors.New("Invalid token")
+	ErrMissingAuth       = errors.New("Missing Authorization header")
 )
 
 func GenerateToken(customer models.Customer, cfg config.Config) (string, error) {
@@ -47,18 +55,38 @@ func GenerateToken(customer models.Customer, cfg config.Config) (string, error) 
 	return signedToken, nil
 }
 
-// GetJWSFromRequest extracts a JWS string from an Authorization: Bearer <jws> header
-func GetJWSFromRequest(req *http.Request) (string, error) {
-	authHdr := req.Header.Get("Authorization")
-	// Check for the Authorization header.
-	if authHdr == "" {
-		return "", ErrNoAuthHeader
+func JWTMiddleware(jwtSecret string) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			authHeader := c.Request().Header.Get(headerAuth)
+			if authHeader == "" {
+				return utils.RespondWithError(c, http.StatusUnauthorized, utils.GetErrorResponse(ErrMissingAuth.Error(), http.StatusUnauthorized))
+			}
+
+			tokenParts := strings.Split(authHeader, " ")
+			if len(tokenParts) != 2 || tokenParts[0] != prefixBearer {
+				return utils.RespondWithError(c, http.StatusUnauthorized, utils.GetErrorResponse(ErrInvalidToken.Error(), http.StatusUnauthorized))
+			}
+
+			tokenString := tokenParts[1]
+			token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+				return []byte(jwtSecret), nil
+			})
+
+			if err != nil {
+				return utils.RespondWithError(c, http.StatusUnauthorized, utils.GetErrorResponse(ErrInvalidToken.Error(), http.StatusUnauthorized))
+			}
+
+			claims, ok := token.Claims.(*Claims)
+			if !ok || !token.Valid {
+				return utils.RespondWithError(c, http.StatusUnauthorized, utils.GetErrorResponse(ErrInvalidToken.Error(), http.StatusUnauthorized))
+			}
+
+			// Set user context
+			c.Set("user", claims)
+			c.Set("id", claims.Id)
+
+			return next(c)
+		}
 	}
-	// We expect a header value of the form "Bearer <token>", with 1 space after
-	// Bearer, per spec.
-	prefix := "Bearer "
-	if !strings.HasPrefix(authHdr, prefix) {
-		return "", ErrInvalidAuthHeader
-	}
-	return strings.TrimPrefix(authHdr, prefix), nil
 }
