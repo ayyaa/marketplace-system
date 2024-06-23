@@ -11,6 +11,7 @@ import (
 	"marketplace-system/services"
 	"os"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
@@ -29,6 +30,7 @@ type Main struct {
 
 type Database struct {
 	Postgres *gorm.DB
+	Redis    *redis.Client
 }
 
 func New() *Main {
@@ -74,6 +76,10 @@ func (m *Main) Init() (err error) {
 			return
 		}
 
+		m.database.Redis, err = database.GetConnectionRedis(m.cfg.Redis)
+		if err != nil {
+			return
+		}
 	}
 
 	e := echo.New()
@@ -96,6 +102,7 @@ func (m *Main) Init() (err error) {
 	m.repo = repository.Init(repository.Options{
 		Config:   m.cfg,
 		Postgres: m.database.Postgres,
+		Redis:    m.database.Redis,
 	})
 
 	m.service = services.Init(services.Options{

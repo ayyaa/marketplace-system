@@ -7,6 +7,7 @@ import (
 
 type Main struct {
 	Customer CustomerInterface
+	Product  ProductInterface
 }
 
 type handlers struct {
@@ -23,6 +24,7 @@ func Init(opts Options) *Main {
 
 	m := &Main{
 		Customer: (*customerHandlers)(hdrl),
+		Product:  (*productHandlers)(hdrl),
 	}
 
 	return m

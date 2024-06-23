@@ -14,7 +14,8 @@ type Config struct {
 	ServiceEnvironment string   `mapstructure:"service_environment" json:"service_environment"`
 	ServicePort        string   `mapstructure:"service_port" json:"service_port"`
 	Database           Database `mapstructure:"database" json:"database"`
-	SecretKeyJWT       string   `mapstructure:"secret_key_jwt" json:"secret_key_jwt"`
+	Redis
+	SecretKeyJWT string `mapstructure:"secret_key_jwt" json:"secret_key_jwt"`
 }
 
 func NewConfig() *Config {
@@ -25,6 +26,12 @@ func NewConfig() *Config {
 		ServicePort:        viper.GetString(`server.port`),
 		Database:           LoadConfigDB(),
 		SecretKeyJWT:       viper.GetString(`jwt.secret_key`),
+		Redis: Redis{
+			Host:     viper.GetString(`redis.host`),
+			Password: viper.GetString(`redis.password`),
+			Db:       viper.GetInt(`redis.db`),
+			Port:     viper.GetString(`redis.port`),
+		},
 	}
 }
 
@@ -36,6 +43,13 @@ type Database struct {
 	ConnMaxLifetime  time.Duration
 	Location         string
 	Timeout          time.Duration
+}
+
+type Redis struct {
+	Host     string
+	Password string
+	Db       int
+	Port     string
 }
 
 // Load all config for the system

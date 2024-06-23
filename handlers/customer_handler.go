@@ -42,7 +42,6 @@ func (h *customerHandlers) InsertCustomer(ctx echo.Context) error {
 	// Bind data from request
 	err := ctx.Bind(&req)
 	if err != nil {
-		logrus.Error(err)
 		return utils.RespondWithError(ctx, http.StatusBadRequest, utils.GetErrorResponse(err.Error(), http.StatusBadRequest))
 
 	}
@@ -52,7 +51,6 @@ func (h *customerHandlers) InsertCustomer(ctx echo.Context) error {
 	if err != nil {
 		if _, ok := err.(validator.ValidationErrors); ok {
 			message := _validator.GetValidatorErrMsg(err.(validator.ValidationErrors))
-			logrus.Error(err)
 			return utils.RespondWithError(ctx, http.StatusBadRequest, utils.GetErrorResponse(message, http.StatusBadRequest))
 		}
 	}
@@ -61,16 +59,13 @@ func (h *customerHandlers) InsertCustomer(ctx echo.Context) error {
 	if err != nil {
 		// check if error contains "customer_email_key", phone number already exist
 		if strings.Contains(err.Error(), "customer_phone_key") {
-			logrus.Error(err)
 			return utils.RespondWithError(ctx, http.StatusBadRequest, utils.GetErrorResponse(lang.ErrorConflictPhoneNumber, http.StatusBadRequest))
 		}
 
 		if strings.Contains(err.Error(), "customer_email_key") {
-			logrus.Error(err)
 			return utils.RespondWithError(ctx, http.StatusBadRequest, utils.GetErrorResponse(lang.ErrorConflictEmail, http.StatusBadRequest))
 		}
 
-		logrus.Error(err)
 		return utils.RespondWithError(ctx, http.StatusInternalServerError, utils.GetErrorResponse(err.Error(), http.StatusInternalServerError))
 	}
 
@@ -100,14 +95,12 @@ func (c *customerHandlers) Login(ctx echo.Context) error {
 	// Bind data from request
 	err := ctx.Bind(&req)
 	if err != nil {
-		logrus.Error(err)
 		return utils.RespondWithError(ctx, http.StatusBadRequest, utils.GetErrorResponse(err.Error(), http.StatusBadRequest))
 	}
 
 	// validate if any user by phone
 	token, err := c.Options.Services.Customer.Login(ctx.Request().Context(), req)
 	if err != nil {
-		logrus.Error(err)
 		return utils.RespondWithError(ctx, customerror.GetStatusCode(err), utils.GetErrorResponse(err.Error(), customerror.GetStatusCode(err)))
 	}
 
