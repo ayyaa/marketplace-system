@@ -2,10 +2,13 @@ package services
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	customerror "marketplace-system/lib/customerrors"
 	"marketplace-system/models"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
 )
 
@@ -33,15 +36,33 @@ func (c *cartServices) AddToCart(ctx context.Context, addCart models.ActionCart)
 
 	addCart.ProductID = product.ProductID
 
+	// Generate Redis key for the cart
+	cartKey := fmt.Sprintf("cart:%d", addCart.CustomerID)
 	tx := c.Options.Postgres.Begin()
-	// Create or update cart
-	cart, err := c.Options.Repository.Cart.GetOrCreateCart(ctx, tx, addCart)
-	if err != nil {
-		tx.Rollback()
+	// Try to get the cart from Redis
+	cartData, err := c.Options.Repository.Cart.GetCartListRedis(ctx, cartKey)
+	var (
+		cart      *models.Cart
+		newDetail models.CartDetail
+	)
+
+	if err == redis.Nil {
+		// Cart not found in Redis, fallback to DB
+		cart, err = c.Options.Repository.Cart.GetOrCreateCart(ctx, tx, addCart)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
 		return err
+	} else {
+		// Cart found in Redis, unmarshal it
+		if err = json.Unmarshal([]byte(cartData), &cart); err != nil {
+			return err
+		}
 	}
 
 	addCart.CartID = cart.CartID
+
 	// Check if the product is already in the cart
 	var existingDetail models.CartDetail
 	existingDetail, err = c.Options.Repository.CartDetail.CheckExistingCartDetail(ctx, addCart)
@@ -55,7 +76,6 @@ func (c *cartServices) AddToCart(ctx context.Context, addCart models.ActionCart)
 		existingDetail.Quantity += addCart.Quantity
 		// Check if quantity is available in stock
 		if product.StockQuantity < existingDetail.Quantity {
-			tx.Rollback()
 			return customerror.NewInternalError("Insufficient stock")
 		}
 		existingDetail.UpdatedAt = time.Now()
@@ -64,14 +84,23 @@ func (c *cartServices) AddToCart(ctx context.Context, addCart models.ActionCart)
 			tx.Rollback()
 			return err
 		}
+
+		// Update the existing detail in the cart details
+		for i, detail := range cart.Details {
+			if detail.CartDetailID == existingDetail.CartDetailID {
+				cart.Details[i] = existingDetail
+				break
+			}
+		}
 	} else {
-		newDetail := models.CartDetail{
+		newDetail = models.CartDetail{
 			CartID:           cart.CartID,
 			ProductID:        addCart.ProductID,
 			Quantity:         addCart.Quantity,
 			CartDetailUUID:   uuid.New().String(),
 			CartDetailStatus: "active",
 		}
+		cart.Details = append(cart.Details, newDetail)
 		existingDetail, err = c.Options.Repository.CartDetail.Create(ctx, tx, newDetail)
 		if err != nil {
 			tx.Rollback()
@@ -80,6 +109,11 @@ func (c *cartServices) AddToCart(ctx context.Context, addCart models.ActionCart)
 	}
 
 	tx.Commit()
+
+	if err = c.Options.Repository.Cart.SetCartRedis(ctx, cartKey, *cart); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -92,10 +126,26 @@ func (c *cartServices) DecreaseFromCart(ctx context.Context, decreaseRequest mod
 	}
 
 	decreaseRequest.ProductID = product.ProductID
-	// Create or update cart
-	cart, err := c.Options.Repository.Cart.GetCart(ctx, decreaseRequest.CustomerID)
-	if err != nil {
+
+	// Generate Redis key for the cart
+	cartKey := fmt.Sprintf("cart:%d", decreaseRequest.CustomerID)
+	// Try to get the cart from Redis
+	cartData, err := c.Options.Repository.Cart.GetCartListRedis(ctx, cartKey)
+	var cart *models.Cart
+
+	if err == redis.Nil {
+		// Cart not found in Redis, fallback to DB
+		cart, err = c.Options.Repository.Cart.GetCart(ctx, decreaseRequest.CustomerID)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
 		return err
+	} else {
+		// Cart found in Redis, unmarshal it
+		if err = json.Unmarshal([]byte(cartData), &cart); err != nil {
+			return err
+		}
 	}
 
 	decreaseRequest.CartID = cart.CartID
@@ -106,7 +156,8 @@ func (c *cartServices) DecreaseFromCart(ctx context.Context, decreaseRequest mod
 		return err
 	}
 
-	// Update quantity if already in cart, otherwise create new detail
+	tx := c.Options.Postgres.Begin()
+	// Update quantity if already in cart, otherwise return error
 	if existingDetail.CartDetailID != 0 {
 		existingDetail.Quantity -= decreaseRequest.Quantity
 		existingDetail.UpdatedAt = time.Now()
@@ -114,16 +165,40 @@ func (c *cartServices) DecreaseFromCart(ctx context.Context, decreaseRequest mod
 		if existingDetail.Quantity <= 0 {
 			// Check if product decrease until 0 and set status to deleted
 			existingDetail.CartDetailStatus = "deleted_by_customer"
-			existingDetail, err = c.Options.Repository.CartDetail.Save(ctx, c.Options.Postgres, existingDetail)
+			existingDetail, err = c.Options.Repository.CartDetail.Save(ctx, tx, existingDetail)
 			if err != nil {
+				tx.Rollback()
 				return err
 			}
-			return nil
+
+			// Remove the detail from the cart
+			for i, detail := range cart.Details {
+				if detail.CartDetailID == existingDetail.CartDetailID {
+					cart.Details = append(cart.Details[:i], cart.Details[i+1:]...)
+					break
+				}
+			}
+
+		} else {
+			// update qty in cart detail
+			existingDetail, err = c.Options.Repository.CartDetail.Save(ctx, tx, existingDetail)
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+
+			// Update the existing detail in the cart details
+			for i, detail := range cart.Details {
+				if detail.CartDetailID == existingDetail.CartDetailID {
+					cart.Details[i] = existingDetail
+					break
+				}
+			}
 		}
 
-		// update qty in cart detail
-		existingDetail, err = c.Options.Repository.CartDetail.Save(ctx, c.Options.Postgres, existingDetail)
-		if err != nil {
+		tx.Commit()
+
+		if err = c.Options.Repository.Cart.SetCartRedis(ctx, cartKey, *cart); err != nil {
 			return err
 		}
 
@@ -131,6 +206,39 @@ func (c *cartServices) DecreaseFromCart(ctx context.Context, decreaseRequest mod
 	}
 
 	return customerror.NewInternalError("cannot decrease qty in cart")
+}
+
+func (c *cartServices) GetCartList(ctx context.Context, id int) (cart models.Cart, err error) {
+	// Generate Redis key for the cart
+	cartKey := fmt.Sprintf("cart:%d", id)
+
+	// Try to get the cart from Redis
+	cartData, err := c.Options.Repository.Cart.GetCartListRedis(ctx, cartKey)
+	if err == nil {
+		// Cart found in Redis, unmarshal it
+		err = json.Unmarshal([]byte(cartData), &cart)
+		if err != nil {
+			return cart, err
+		}
+		return cart, nil
+	} else if err != redis.Nil {
+		// Redis error other than key not found
+		return cart, err
+	}
+
+	// Cart not found in Redis, fallback to DB
+	cart, err = c.Options.Repository.Cart.GetCartList(ctx, id)
+	if err != nil {
+		return cart, err
+	}
+
+	// Set cart data in Redis for future access
+	err = c.Options.Repository.Cart.SetCartRedis(ctx, cartKey, cart)
+	if err != nil {
+		return cart, err
+	}
+
+	return cart, nil
 }
 
 func (c *cartServices) DeleteFromCart(ctx context.Context, deleteRequest models.ActionCart) (err error) {
@@ -142,16 +250,35 @@ func (c *cartServices) DeleteFromCart(ctx context.Context, deleteRequest models.
 	}
 
 	deleteRequest.ProductID = product.ProductID
-	cart, err := c.Options.Repository.Cart.GetCart(ctx, deleteRequest.CustomerID)
-	if err != nil {
+
+	// Generate Redis key for the cart
+	cartKey := fmt.Sprintf("cart:%d", deleteRequest.CustomerID)
+	// Try to get the cart from Redis
+	cartData, err := c.Options.Repository.Cart.GetCartListRedis(ctx, cartKey)
+	var cart *models.Cart
+
+	if err == redis.Nil {
+		// Cart not found in Redis, fallback to DB
+		cart, err = c.Options.Repository.Cart.GetCart(ctx, deleteRequest.CustomerID)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
 		return err
+	} else {
+		// Cart found in Redis, unmarshal it
+		if err = json.Unmarshal([]byte(cartData), &cart); err != nil {
+			return err
+		}
 	}
 
+	tx := c.Options.Postgres.Begin()
 	deleteRequest.CartID = cart.CartID
 	// Check if the product is already in the cart detail
 	var existingDetail models.CartDetail
 	existingDetail, err = c.Options.Repository.CartDetail.CheckExistingCartDetail(ctx, deleteRequest)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -160,8 +287,24 @@ func (c *cartServices) DeleteFromCart(ctx context.Context, deleteRequest models.
 		existingDetail.UpdatedAt = time.Now()
 		existingDetail.Quantity = 0
 		existingDetail.CartDetailStatus = "deleted_by_customer"
-		existingDetail, err = c.Options.Repository.CartDetail.Save(ctx, c.Options.Postgres, existingDetail)
+		existingDetail, err = c.Options.Repository.CartDetail.Save(ctx, tx, existingDetail)
 		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		// Remove the detail from the cart
+		for i, detail := range cart.Details {
+			if detail.CartDetailID == existingDetail.CartDetailID {
+				cart.Details = append(cart.Details[:i], cart.Details[i+1:]...)
+				break
+			}
+		}
+
+		tx.Commit()
+
+		// Otherwise, update the cart in Redis
+		if err = c.Options.Repository.Cart.SetCartRedis(ctx, cartKey, *cart); err != nil {
 			return err
 		}
 
@@ -169,13 +312,4 @@ func (c *cartServices) DeleteFromCart(ctx context.Context, deleteRequest models.
 	}
 
 	return customerror.NewInternalError("product not found in cart")
-}
-
-func (c *cartServices) GetCartList(ctx context.Context, id int) (cart models.Cart, err error) {
-	cart, err = c.Options.Repository.Cart.GetCartList(ctx, id)
-	if err != nil {
-		return cart, err
-	}
-
-	return cart, nil
 }

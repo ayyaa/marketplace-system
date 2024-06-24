@@ -31,9 +31,9 @@ type CustomerInterface interface {
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		models.CustomerRequest	true	"Create customer"
-//	@Success		201		{object}	models.Response{data=[]models.Customer}
-//	@Failure		400		{object}	models.BasicResponse{message=[]string}
-//	@Failure		500		{object}	models.BasicResponse{message=[]string}
+//	@Success		201		{object}	models.ResponseSuccess{data=models.Customer}
+//	@Failure		400		{object}	models.ApplicationError{message=[]string}
+//	@Failure		500		{object}	models.ApplicationError{messsage=[]string}
 //	@Router			/register [post]
 func (h *customerHandlers) InsertCustomer(ctx echo.Context) error {
 
@@ -83,10 +83,10 @@ func (h *customerHandlers) InsertCustomer(ctx echo.Context) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		models.CustomerRequest	true	"Create customer"
-//	@Success		201		{object}	models.Response{data=[]models.Customer}
-//	@Failure		400		{object}	models.BasicResponse{message=[]string}
-//	@Failure		500		{object}	models.BasicResponse{message=[]string}
-//	@Router			/register [post]
+//	@Success		201		{object}	models.ResponseSuccess{data=[]models.Customer}
+//	@Failure		400		{object}	models.ApplicationError{message=[]string}
+//	@Failure		500		{object}	models.ApplicationError{message=[]string}
+//	@Router			/login [post]
 func (c *customerHandlers) Login(ctx echo.Context) error {
 
 	// intial

@@ -17,7 +17,7 @@ type Order struct {
 	CreatedAt          time.Time `gorm:"autoCreateTime"`
 	UpdatedAt          time.Time `gorm:"autoUpdateTime"`
 
-	Details []OrderDetail `gorm:"foreignKey:OrderDetailID"`
+	Details []OrderDetail `gorm:"foreignKey:OrderID"`
 }
 
 type OrderDetail struct {

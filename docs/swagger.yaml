@@ -1,0 +1,607 @@
+basePath: /v1
+definitions:
+  models.ApplicationError:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+      success:
+        type: boolean
+    type: object
+  models.Cart:
+    properties:
+      cartID:
+        type: integer
+      cartStatus:
+        type: string
+      cartUUID:
+        type: string
+      createdAt:
+        type: string
+      customerID:
+        type: integer
+      details:
+        items:
+          $ref: '#/definitions/models.CartDetail'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  models.CartDetail:
+    properties:
+      cartDetailID:
+        type: integer
+      cartDetailStatus:
+        type: string
+      cartDetailUUID:
+        type: string
+      cartID:
+        type: integer
+      createdAt:
+        type: string
+      productID:
+        type: integer
+      quantity:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  models.CartRequest:
+    properties:
+      product_slug:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+    required:
+    - product_slug
+    - quantity
+    type: object
+  models.Customer:
+    properties:
+      address:
+        type: string
+      createdAt:
+        type: string
+      customerID:
+        type: integer
+      customerStatus:
+        type: string
+      customerUUID:
+        type: string
+      email:
+        type: string
+      fullName:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.CustomerRequest:
+    properties:
+      address:
+        type: string
+      email:
+        maxLength: 255
+        type: string
+      full_name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      password:
+        maxLength: 255
+        minLength: 8
+        type: string
+      phone:
+        type: string
+    required:
+    - email
+    - full_name
+    - password
+    - phone
+    type: object
+  models.DeleteCartRequest:
+    properties:
+      product_slug:
+        type: string
+    required:
+    - product_slug
+    type: object
+  models.Order:
+    properties:
+      cartID:
+        type: integer
+      createdAt:
+        type: string
+      customerID:
+        type: integer
+      details:
+        items:
+          $ref: '#/definitions/models.OrderDetail'
+        type: array
+      expiredAt:
+        type: string
+      grandTotal:
+        type: number
+      invoiceNumber:
+        type: string
+      orderDate:
+        type: string
+      orderID:
+        type: integer
+      orderPaymentStatus:
+        type: string
+      orderPaymentType:
+        type: string
+      orderStatus:
+        type: string
+      orderUUID:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.OrderDetail:
+    properties:
+      createdAt:
+        type: string
+      finalPrice:
+        type: number
+      orderDetailID:
+        type: integer
+      orderDetailStatus:
+        type: string
+      orderDetailUUID:
+        type: string
+      orderID:
+        type: integer
+      price:
+        type: number
+      productID:
+        type: integer
+      quantity:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  models.Product:
+    properties:
+      categoryID:
+        type: integer
+      createdAt:
+        type: string
+      description:
+        type: string
+      price:
+        type: number
+      productID:
+        type: integer
+      productName:
+        type: string
+      productSlug:
+        type: string
+      productStatus:
+        type: string
+      productUUID:
+        type: string
+      stockQuantity:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  models.ResponseSuccess:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:5657
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a Marketplace System server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Echo Swagger Marketplace System API
+  version: "1.0"
+paths:
+  /cart:
+    get:
+      consumes:
+      - application/json
+      description: Get list cart detail from cart
+      operationId: cart-detail-list
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Cart'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                messsage:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Get List of Cart
+      tags:
+      - Cart
+  /cart/add:
+    patch:
+      consumes:
+      - application/json
+      description: Add to cart
+      operationId: add-to-cart
+      parameters:
+      - description: add to cart
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CartRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ResponseSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                messsage:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Add to cart
+      tags:
+      - Cart
+  /cart/decrease:
+    patch:
+      consumes:
+      - application/json
+      description: Decrease product from cart detail one by one or by qty
+      operationId: decrease-from-cart
+      parameters:
+      - description: add to cart
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CartRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ResponseSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                messsage:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Decrease From cart
+      tags:
+      - Cart
+  /cart/delete:
+    patch:
+      consumes:
+      - application/json
+      description: Delete product from cart detail
+      operationId: delete-from-cart
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: add to cart
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteCartRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ResponseSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                messsage:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Delete From cart
+      tags:
+      - Cart
+  /categories/{slug}/products:
+    get:
+      consumes:
+      - application/json
+      description: Get Product by Categories
+      operationId: get-product-by-categories
+      parameters:
+      - description: Param slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Product'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                messsage:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Get Product by Categories
+      tags:
+      - Product
+  /checkout:
+    post:
+      consumes:
+      - application/json
+      description: Checkout order
+      operationId: checkout-order
+      parameters:
+      - description: Checkout Order
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Order'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                messsage:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Checkout order
+      tags:
+      - Checkout
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      operationId: customer-login
+      parameters:
+      - description: Create customer
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseSuccess'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Customer'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Login
+      tags:
+      - Customer
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create customer / register
+      operationId: customer-create
+      parameters:
+      - description: Create customer
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Customer'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                messsage:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Create Customer / Register
+      tags:
+      - Customer
+schemes:
+- http
+swagger: "2.0"

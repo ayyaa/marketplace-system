@@ -30,9 +30,9 @@ type CartInterface interface {
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		models.CartRequest	true	"add to cart"
-//	@Success		201		{object}	models.Response{data=[]models.Customer}
-//	@Failure		400		{object}	models.BasicResponse{message=[]string}
-//	@Failure		500		{object}	models.BasicResponse{messsage=[]string}
+//	@Success		201		{object}	models.ResponseSuccess{}
+//	@Failure		400		{object}	models.ApplicationError{message=[]string}
+//	@Failure		500		{object}	models.ApplicationError{messsage=[]string}
 //	@Router			/cart/add [patch]
 func (c *cartHandlers) AddToCart(ctx echo.Context) error {
 	var req models.CartRequest
@@ -74,9 +74,9 @@ func (c *cartHandlers) AddToCart(ctx echo.Context) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		models.CartRequest	true	"add to cart"
-//	@Success		201		{object}	models.Response{data=[]models.Customer}
-//	@Failure		400		{object}	models.BasicResponse{message=[]string}
-//	@Failure		500		{object}	models.BasicResponse{messsage=[]string}
+//	@Success		201		{object}	models.ResponseSuccess{}
+//	@Failure		400		{object}	models.ApplicationError{message=[]string}
+//	@Failure		500		{object}	models.ApplicationError{messsage=[]string}
 //	@Router			/cart/decrease [patch]
 func (c *cartHandlers) DecreaseFromCart(ctx echo.Context) error {
 	var req models.CartRequest
@@ -111,16 +111,19 @@ func (c *cartHandlers) DecreaseFromCart(ctx echo.Context) error {
 
 // Cart godoc
 //
-//	@Summary		Decrease From cart
+//	@Summary		Delete From cart
 //	@Description	Delete product from cart detail
-//	@ID				decrease-from-cart
+//	@ID				delete-from-cart
 //	@Tags			Cart
 //	@Accept			json
 //	@Produce		json
+//
+// @param 			Authorization header string true "Authorization"
+//
 //	@Param			request	body		models.DeleteCartRequest	true	"add to cart"
-//	@Success		201		{object}	models.Response{data=[]models.Customer}
-//	@Failure		400		{object}	models.BasicResponse{message=[]string}
-//	@Failure		500		{object}	models.BasicResponse{messsage=[]string}
+//	@Success		201		{object}	models.ResponseSuccess{}
+//	@Failure		400		{object}	models.ApplicationError{message=[]string}
+//	@Failure		500		{object}	models.ApplicationError{messsage=[]string}
 //	@Router			/cart/delete [patch]
 func (c *cartHandlers) DeleteFromCart(ctx echo.Context) error {
 	var req models.DeleteCartRequest
@@ -160,9 +163,9 @@ func (c *cartHandlers) DeleteFromCart(ctx echo.Context) error {
 //	@Tags			Cart
 //	@Accept			json
 //	@Produce		json
-//	@Success		201		{object}	models.Response{data=[]models.Customer}
-//	@Failure		400		{object}	models.BasicResponse{message=[]string}
-//	@Failure		500		{object}	models.BasicResponse{messsage=[]string}
+//	@Success		201		{object}	models.ResponseSuccess{data=[]models.Cart}
+//	@Failure		400		{object}	models.ApplicationError{message=[]string}
+//	@Failure		500		{object}	models.ApplicationError{messsage=[]string}
 //	@Router			/cart [get]
 func (c *cartHandlers) CartDetailList(ctx echo.Context) error {
 	id := ctx.Get("id").(int)

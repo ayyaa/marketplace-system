@@ -15,7 +15,7 @@ type ProductInterface interface {
 	FindProductsByCategory(ctx echo.Context) error
 }
 
-// Customer godoc
+// Product godoc
 //
 //	@Summary		Get Product by Categories
 //	@Description	Get Product by Categories
@@ -24,9 +24,9 @@ type ProductInterface interface {
 //	@Accept			json
 //	@Produce		json
 //	@Param			slug	path		string	true	"Param slug"
-//	@Success		201		{object}	models.Response{data=[]models.Customer}
-//	@Failure		400		{object}	models.BasicResponse{message=[]string}
-//	@Failure		500		{object}	models.BasicResponse{messsage=[]string}
+//	@Success		201		{object}	models.ResponseSuccess{data=[]models.Product}
+//	@Failure		400		{object}	models.ApplicationError{message=[]string}
+//	@Failure		500		{object}	models.ApplicationError{messsage=[]string}
 //	@Router			/categories/{slug}/products [get]
 func (h *productHandlers) FindProductsByCategory(ctx echo.Context) error {
 	categorySlug := ctx.Param("slug")

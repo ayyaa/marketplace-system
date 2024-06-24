@@ -19,7 +19,7 @@ type CheckoutInterface interface {
 	Checkout(ctx echo.Context) error
 }
 
-// Customer godoc
+// Checkout godoc
 //
 //	@Summary		Checkout order
 //	@Description	Checkout order
@@ -28,9 +28,9 @@ type CheckoutInterface interface {
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		models.CustomerRequest	true	"Checkout Order"
-//	@Success		201		{object}	models.Response{data=[]models.Customer}
-//	@Failure		400		{object}	models.BasicResponse{message=[]string}
-//	@Failure		500		{object}	models.BasicResponse{messsage=[]string}
+//	@Success		201		{object}	models.ResponseSuccess{data=models.Order}
+//	@Failure		400		{object}	models.ApplicationError{message=[]string}
+//	@Failure		500		{object}	models.ApplicationError{messsage=[]string}
 //	@Router			/checkout [post]
 func (c *checkoutHandlers) Checkout(ctx echo.Context) error {
 

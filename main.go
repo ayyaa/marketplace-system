@@ -37,9 +37,9 @@ func New() *Main {
 	return new(Main)
 }
 
-// @title Echo Swagger Example API
+// @title Echo Swagger Marketplace System API
 // @version 1.0
-// @description This is a sample server server.
+// @description This is a Marketplace System server.
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support
