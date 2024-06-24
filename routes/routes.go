@@ -8,6 +8,8 @@ import (
 	"github.com/labstack/echo/v4"
 
 	echoSwagger "github.com/swaggo/echo-swagger"
+
+	_ "marketplace-system/docs"
 )
 
 func ConfigureRouter(e *echo.Echo, handlers *handlers.Main, cfg *config.Config) {

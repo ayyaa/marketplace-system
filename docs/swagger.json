@@ -18,7 +18,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:5657",
+    "host": "localhost:8080",
     "basePath": "/v1",
     "paths": {
         "/cart": {
@@ -35,6 +35,15 @@
                 ],
                 "summary": "Get List of Cart",
                 "operationId": "cart-detail-list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -118,6 +127,13 @@
                 "operationId": "add-to-cart",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "add to cart",
                         "name": "request",
                         "in": "body",
@@ -194,6 +210,13 @@
                 "summary": "Decrease From cart",
                 "operationId": "decrease-from-cart",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "add to cart",
                         "name": "request",
@@ -540,7 +563,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CustomerRequest"
+                            "$ref": "#/definitions/models.LoginRequest"
                         }
                     }
                 ],
@@ -556,10 +579,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/models.Customer"
-                                            }
+                                            "$ref": "#/definitions/models.LoginResponse"
                                         }
                                     }
                                 }
@@ -625,6 +645,15 @@
                 ],
                 "summary": "Get order by invoice Id",
                 "operationId": "get-orders-by-invoice-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -703,6 +732,15 @@
                 ],
                 "summary": "Get orders",
                 "operationId": "get-orders",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -1019,6 +1057,26 @@
             ],
             "properties": {
                 "product_slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "LoginReq defines model for LoginReq.",
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
                     "type": "string"
                 }
             }

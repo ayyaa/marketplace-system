@@ -24,6 +24,9 @@ type OrderInterface interface {
 //	@Tags			Order
 //	@Accept			json
 //	@Produce		json
+//
+// @param 			Authorization header string true "Authorization"
+//
 //	@Success		201		{object}	models.ResponseSuccess{data=models.Order}
 //	@Failure		400		{object}	models.ApplicationError{message=[]string}
 //	@Failure		500		{object}	models.ApplicationError{messsage=[]string}
@@ -48,6 +51,9 @@ func (c *orderHandlers) GetOrders(ctx echo.Context) error {
 //	@Tags			Order
 //	@Accept			json
 //	@Produce		json
+//
+// @param 			Authorization header string true "Authorization"
+//
 //	@Success		201		{object}	models.ResponseSuccess{data=models.Order}
 //	@Failure		400		{object}	models.ApplicationError{message=[]string}
 //	@Failure		500		{object}	models.ApplicationError{messsage=[]string}

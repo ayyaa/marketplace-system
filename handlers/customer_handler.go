@@ -82,8 +82,8 @@ func (h *customerHandlers) InsertCustomer(ctx echo.Context) error {
 //	@Tags			Customer
 //	@Accept			json
 //	@Produce		json
-//	@Param			request	body		models.CustomerRequest	true	"Create customer"
-//	@Success		201		{object}	models.ResponseSuccess{data=[]models.Customer}
+//	@Param			request	body		models.LoginRequest	true	"Create customer"
+//	@Success		201		{object}	models.ResponseSuccess{data=models.LoginResponse}
 //	@Failure		400		{object}	models.ApplicationError{message=[]string}
 //	@Failure		500		{object}	models.ApplicationError{message=[]string}
 //	@Router			/login [post]

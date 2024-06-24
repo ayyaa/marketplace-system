@@ -111,6 +111,19 @@ definitions:
     required:
     - product_slug
     type: object
+  models.LoginRequest:
+    properties:
+      password:
+        description: LoginReq defines model for LoginReq.
+        type: string
+      phone:
+        type: string
+    type: object
+  models.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
   models.Order:
     properties:
       cartID:
@@ -200,7 +213,7 @@ definitions:
       success:
         type: boolean
     type: object
-host: localhost:5657
+host: localhost:8080
 info:
   contact:
     email: support@swagger.io
@@ -220,6 +233,12 @@ paths:
       - application/json
       description: Get list cart detail from cart
       operationId: cart-detail-list
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -266,6 +285,11 @@ paths:
       description: Add to cart
       operationId: add-to-cart
       parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: add to cart
         in: body
         name: request
@@ -311,6 +335,11 @@ paths:
       description: Decrease product from cart detail one by one or by qty
       operationId: decrease-from-cart
       parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: add to cart
         in: body
         name: request
@@ -512,7 +541,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.CustomerRequest'
+          $ref: '#/definitions/models.LoginRequest'
       produces:
       - application/json
       responses:
@@ -523,9 +552,7 @@ paths:
             - $ref: '#/definitions/models.ResponseSuccess'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/models.Customer'
-                  type: array
+                  $ref: '#/definitions/models.LoginResponse'
               type: object
         "400":
           description: Bad Request
@@ -558,6 +585,12 @@ paths:
       - application/json
       description: Get orders  by invoice Id
       operationId: get-orders-by-invoice-id
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -601,6 +634,12 @@ paths:
       - application/json
       description: Get orders
       operationId: get-orders
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:

@@ -29,6 +29,9 @@ type CartInterface interface {
 //	@Tags			Cart
 //	@Accept			json
 //	@Produce		json
+//
+// @param 			Authorization header string true "Authorization"
+//
 //	@Param			request	body		models.CartRequest	true	"add to cart"
 //	@Success		201		{object}	models.ResponseSuccess{}
 //	@Failure		400		{object}	models.ApplicationError{message=[]string}
@@ -73,6 +76,9 @@ func (c *cartHandlers) AddToCart(ctx echo.Context) error {
 //	@Tags			Cart
 //	@Accept			json
 //	@Produce		json
+//
+// @param 			Authorization header string true "Authorization"
+//
 //	@Param			request	body		models.CartRequest	true	"add to cart"
 //	@Success		201		{object}	models.ResponseSuccess{}
 //	@Failure		400		{object}	models.ApplicationError{message=[]string}
@@ -163,6 +169,9 @@ func (c *cartHandlers) DeleteFromCart(ctx echo.Context) error {
 //	@Tags			Cart
 //	@Accept			json
 //	@Produce		json
+//
+// @param 			Authorization header string true "Authorization"
+//
 //	@Success		201		{object}	models.ResponseSuccess{data=[]models.Cart}
 //	@Failure		400		{object}	models.ApplicationError{message=[]string}
 //	@Failure		500		{object}	models.ApplicationError{messsage=[]string}
