@@ -83,3 +83,21 @@ CREATE TABLE order_details (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+INSERT INTO categories (category_uuid, category_name, category_slug, category_status, created_at, updated_at)
+VALUES
+    (gen_random_uuid(), 'Electronics', 'electronics', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 'Books', 'books', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 'Clothing', 'clothing', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 'Home & Kitchen', 'home-kitchen', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 'Sports', 'sports', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+   
+   
+INSERT INTO products (product_uuid, category_id, product_name, product_slug, price, stock_quantity, description, product_status, created_at, updated_at)
+VALUES
+    (gen_random_uuid(), 1, 'Smartphone', 'smartphone', 6999900, 50, 'Latest model with advanced features', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 1, 'Laptop', 'laptop', 12999900, 30, 'High performance laptop for work and play', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 2, 'Science Fiction Novel', 'science-fiction-novel', 159900, 100, 'A thrilling science fiction story', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 3, 'Mens T-Shirt', 'mens-tshirt', 49990, 200, 'Comfortable cotton t-shirt', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 4, 'Blender', 'blender', 499900, 75, 'High speed blender for smoothies and more', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 5, 'Yoga Mat', 'yoga-mat', 259900, 150, 'Non-slip yoga mat for home workouts', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

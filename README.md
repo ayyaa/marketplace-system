@@ -31,3 +31,17 @@ If you change `database.sql` file, you need to reinitate the database by running
 ```
 docker-compose down --volumes
 ```
+
+# Documentation Api Spec
+
+To see the api spec documentation, run the following command:
+
+```
+swagger serve ./docs/swagger.yaml
+```
+
+if there changers anotation for api spec, by running:
+```
+swag init -g main.go --output docs
+```
+
