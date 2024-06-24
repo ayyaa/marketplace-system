@@ -54,10 +54,12 @@ func New() *Main {
 // @schemes http
 func (m *Main) Init() (err error) {
 	// Set the configuration file name and path
-	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
-	viper.SetConfigType("json")
-	viper.AutomaticEnv()
+	// viper.SetConfigName("config")
+	// viper.AddConfigPath(".")
+	// viper.SetConfigType("json")
+	// viper.AutomaticEnv()
+
+	viper.SetConfigFile(".env")
 	err = viper.ReadInConfig()
 	if err != nil {
 		m.cfg = &config.Config{

@@ -20,17 +20,17 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
-		ServiceHost:        viper.GetString(`server.app_host`),
-		ServiceEndpointV:   viper.GetString(`server.endpoint_v`),
-		ServiceEnvironment: viper.GetString(`server.environtment`),
-		ServicePort:        viper.GetString(`server.port`),
+		ServiceHost:        viper.GetString(`APP_HOST`),
+		ServiceEndpointV:   viper.GetString(`APP_ENDPOINT_V`),
+		ServiceEnvironment: viper.GetString(`APP_ENVIRONMENT`),
+		ServicePort:        viper.GetString(`APP_PORT`),
 		Database:           LoadConfigDB(),
-		SecretKeyJWT:       viper.GetString(`jwt.secret_key`),
+		SecretKeyJWT:       viper.GetString(`JWT_SECRET_KEY`),
 		Redis: Redis{
-			Host:     viper.GetString(`redis.host`),
-			Password: viper.GetString(`redis.password`),
-			Db:       viper.GetInt(`redis.db`),
-			Port:     viper.GetString(`redis.port`),
+			Host:     viper.GetString(`REDIS_HOST`),
+			Password: viper.GetString(`REDIS_PASSWORD`),
+			Db:       viper.GetInt(`REDIS_DB`),
+			Port:     viper.GetString(`REDIS_PORT`),
 		},
 	}
 }
@@ -64,19 +64,19 @@ func LoadConfigDB() Database {
 		fmt.Println("Service RUN on DEBUG mode")
 	}
 
-	dbHost := viper.GetString(`database.host`)
-	dbUser := viper.GetString(`database.user`)
-	dbName := viper.GetString(`database.name`)
-	dbPassword := viper.GetString(`database.password`)
-	dbPort := viper.GetString(`database.port`)
+	dbHost := viper.GetString(`DB_POSTGRES_HOST`)
+	dbUser := viper.GetString(`DB_POSTGRES_USER`)
+	dbName := viper.GetString(`DB_POSTGRES_NAME`)
+	dbPassword := viper.GetString(`DB_POSTGRES_PASSWORD`)
+	dbPort := viper.GetString(`DB_POSTGRES_PORT`)
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta", dbHost, dbUser, dbPassword, dbName, dbPort)
 	cfg := Database{
 		ConnectionString: dsn,
-		MaxIdleConns:     viper.GetInt(`database.max_idle_conn`),
-		MaxOpenConns:     viper.GetInt(`database.max_open_conn`),
-		ConnMaxLifetime:  viper.GetDuration(`database.max_life_time`),
-		Timeout:          viper.GetDuration(`database.timeout`),
+		MaxIdleConns:     viper.GetInt(`DB_POSTGRES_MAX_IDLE_CONNS`),
+		MaxOpenConns:     viper.GetInt(`DB_POSTGRES_MAX_OPEN_CONNS`),
+		ConnMaxLifetime:  viper.GetDuration(`DB_POSTGRES_MAX_LIFE_TIME`),
+		Timeout:          viper.GetDuration(`DB_POSTGRES_TIMEOUT`),
 	}
 
 	return cfg
