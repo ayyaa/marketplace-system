@@ -10,6 +10,7 @@ type Main struct {
 	Product  ProductInterface
 	Cart     CartInterface
 	Checkout CheckoutInterface
+	Order    OrderInterface
 }
 
 type handlers struct {
@@ -29,6 +30,7 @@ func Init(opts Options) *Main {
 		Product:  (*productHandlers)(hdrl),
 		Cart:     (*cartHandlers)(hdrl),
 		Checkout: (*checkoutHandlers)(hdrl),
+		Order:    (*orderHandlers)(hdrl),
 	}
 
 	return m

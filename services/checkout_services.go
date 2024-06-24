@@ -16,6 +16,8 @@ type checkoutServices services
 
 type CheckoutInterface interface {
 	Checkout(ctx context.Context, checkout models.Checkout) (order models.Order, err error)
+	GetOrders(ctx context.Context, id int) (order []models.Order, err error)
+	GetOrderByInvoice(ctx context.Context, invoiceNumber string) (order models.Order, err error)
 }
 
 // func (c *checkoutServices) Checkout(ctx context.Context, checkout models.Checkout) (order models.Order, err error) {
@@ -189,6 +191,24 @@ func (c *checkoutServices) Checkout(ctx context.Context, checkout models.Checkou
 	}
 
 	order, err = c.Options.Repository.Order.GetOrderById(ctx, order.OrderID)
+	if err != nil {
+		return order, err
+	}
+
+	return order, nil
+}
+
+func (c *checkoutServices) GetOrders(ctx context.Context, id int) (order []models.Order, err error) {
+	order, err = c.Options.Repository.Order.GetOrders(ctx, id)
+	if err != nil {
+		return order, err
+	}
+
+	return order, nil
+}
+
+func (c *checkoutServices) GetOrderByInvoice(ctx context.Context, invoiceNumber string) (order models.Order, err error) {
+	order, err = c.Options.Repository.Order.GetOrderByInvoice(ctx, invoiceNumber)
 	if err != nil {
 		return order, err
 	}

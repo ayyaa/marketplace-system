@@ -552,6 +552,92 @@ paths:
       summary: Login
       tags:
       - Customer
+  /order/:invoice:
+    post:
+      consumes:
+      - application/json
+      description: Get orders  by invoice Id
+      operationId: get-orders-by-invoice-id
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Order'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                messsage:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Get order by invoice Id
+      tags:
+      - Order
+  /orders:
+    post:
+      consumes:
+      - application/json
+      description: Get orders
+      operationId: get-orders
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseSuccess'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Order'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                message:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ApplicationError'
+            - properties:
+                messsage:
+                  items:
+                    type: string
+                  type: array
+              type: object
+      summary: Get orders
+      tags:
+      - Order
   /register:
     post:
       consumes:

@@ -16,6 +16,8 @@ type OrderInterface interface {
 	CreateOrder(ctx context.Context, tx *gorm.DB, order models.Order) (models.Order, error)
 	CreateOrderDetail(ctx context.Context, tx *gorm.DB, orderDetail []*models.OrderDetail) ([]*models.OrderDetail, error)
 	GetOrderById(ctx context.Context, id int) (order models.Order, err error)
+	GetOrders(ctx context.Context, id int) (order []models.Order, err error)
+	GetOrderByInvoice(ctx context.Context, invoiceNumber string) (order models.Order, err error)
 }
 
 func (c *orderRepository) CreateOrder(ctx context.Context, tx *gorm.DB, order models.Order) (models.Order, error) {
@@ -44,6 +46,30 @@ func (c *orderRepository) GetOrderById(ctx context.Context, id int) (order model
 	err = c.Options.Postgres.Preload("Details", func(db *gorm.DB) *gorm.DB {
 		return db.Where("order_detail_status = ? ", "active")
 	}).Where("order_id = ?", id).Where("order_status = ?", "pending").First(&order).Error
+	if err != nil {
+		logrus.Error(fmt.Sprintf("Err - get cart list - %s", err.Error()))
+		return order, err
+	}
+
+	return order, nil
+}
+
+func (c *orderRepository) GetOrders(ctx context.Context, id int) (order []models.Order, err error) {
+	err = c.Options.Postgres.Preload("Details", func(db *gorm.DB) *gorm.DB {
+		return db.Where("order_detail_status = ? ", "active")
+	}).Where("customer_id = ?", id).Find(&order).Error
+	if err != nil {
+		logrus.Error(fmt.Sprintf("Err - get order list - %s", err.Error()))
+		return order, err
+	}
+
+	return order, nil
+}
+
+func (c *orderRepository) GetOrderByInvoice(ctx context.Context, invoiceNumber string) (order models.Order, err error) {
+	err = c.Options.Postgres.Preload("Details", func(db *gorm.DB) *gorm.DB {
+		return db.Where("order_detail_status = ? ", "active")
+	}).Where("invoice_number = ?", invoiceNumber).First(&order).Error
 	if err != nil {
 		logrus.Error(fmt.Sprintf("Err - get cart list - %s", err.Error()))
 		return order, err

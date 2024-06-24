@@ -44,5 +44,15 @@ func ConfigureRouter(e *echo.Echo, handlers *handlers.Main, cfg *config.Config) 
 			checkout.POST("", handlers.Checkout.Checkout)
 		}
 
+		orders := v1.Group("/orders", middleware.JWTMiddleware(cfg.SecretKeyJWT))
+		{
+			orders.GET("", handlers.Order.GetOrders)
+		}
+
+		order := v1.Group("/order", middleware.JWTMiddleware(cfg.SecretKeyJWT))
+		{
+			order.GET("/:invoice", handlers.Order.GetOrdersById)
+		}
+
 	}
 }
