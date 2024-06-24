@@ -1,6 +1,6 @@
 module marketplace-system
 
-go 1.22.4
+go 1.22
 
 require (
 	github.com/go-playground/validator/v10 v10.22.0

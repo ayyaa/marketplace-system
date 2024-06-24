@@ -2,10 +2,10 @@ services:
   app:
     build: .
     ports:
-      - "8080:5656"
+      - "8080:5657"
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/database?sslmode=disable
-      DB_HOST: my-postgres
+      DB_HOST: localhost
       DB_PORT: 5432 
       DB_USER: postgres 
       DB_PASSWORD: postgres 
@@ -14,12 +14,12 @@ services:
       db:
         condition: service_healthy
   redis:
-    container_name: my-redis
+    container_name: my-redis-marketplace
     image: redis
     ports:
       - 6379:6379
   db:
-    container_name: my-postgres
+    container_name: my-postgres-marketplace
     platform: linux/x86_64
     image: postgres:latest
     restart: always

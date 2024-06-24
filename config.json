@@ -10,7 +10,7 @@
       "timeout":5
     },
     "database": {
-      "host": "localhost",
+      "host": "my-postgres-marketplace",
       "port": "5432",
       "user": "postgres",
       "name": "database",
@@ -21,7 +21,7 @@
       "timeout":"20s"
     },
     "redis": {
-        "host": "localhost",
+        "host": "my-redis-marketplace",
         "port": "6379",
         "password": "",
         "db": 0
